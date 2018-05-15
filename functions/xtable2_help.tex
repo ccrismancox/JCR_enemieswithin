@@ -1,0 +1,415 @@
+\documentclass{article}\usepackage{graphicx, color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\definecolor{fgcolor}{rgb}{0.2, 0.2, 0.2}
+\newcommand{\hlnumber}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlfunctioncall}[1]{\textcolor[rgb]{0.501960784313725,0,0.329411764705882}{\textbf{#1}}}%
+\newcommand{\hlstring}[1]{\textcolor[rgb]{0.6,0.6,1}{#1}}%
+\newcommand{\hlkeyword}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlargument}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
+\newcommand{\hlcomment}[1]{\textcolor[rgb]{0.180392156862745,0.6,0.341176470588235}{#1}}%
+\newcommand{\hlroxygencomment}[1]{\textcolor[rgb]{0.43921568627451,0.47843137254902,0.701960784313725}{#1}}%
+\newcommand{\hlformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
+\newcommand{\hleqformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
+\newcommand{\hlassignement}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlpackage}[1]{\textcolor[rgb]{0.588235294117647,0.709803921568627,0.145098039215686}{#1}}%
+\newcommand{\hlslot}[1]{\textit{#1}}%
+\newcommand{\hlsymbol}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlprompt}[1]{\textcolor[rgb]{0.2,0.2,0.2}{#1}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage{amsmath, amsfonts, amssymb, amsthm, enumitem, array, fancyhdr, graphicx, mathrsfs, rotating}
+ \usepackage{dcolumn}
+\usepackage{float}
+\usepackage{verbatim}
+\usepackage[australian]{babel}
+
+\usepackage[top=1.00in,bottom=1.00in,left=1.00in,right=1in]{geometry} 
+\usepackage{siunitx}
+\sisetup{
+  input-symbols=(),
+  table-align-text-post = false,
+	group-digits=false
+} 
+\title{\texttt{xtable.2}: \texttt{xtable}'s Hot Cousin}
+
+\author{Casey Crisman-Cox}
+\date{\today}
+\newcommand{\R}{\textsf{R} }
+\begin{document}
+
+\maketitle
+\section{Preliminaries}
+A few things to make set up before using the package.  First in your \LaTeX document make sure that you have the following in your preamble:
+\begin{verbatim}
+\usepackage{siunitx}
+\sisetup{
+  input-symbols=(),
+	table-align-text-post = false,
+	group-digits=false
+} 
+\end{verbatim}
+Second, source the function
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlfunctioncall{source}(\hlstring{"Tabling.R"})
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Now the functions are loaded and the necesssary libraries are loaded. They  are automatically installed if \R can't find them.\footnote{It's only \texttt{stringr} and \texttt{xtable} so don't worry, I'm not downloading porn to your computer}
+\section{Using the Function}
+Let's start by getting some data. Say we have some binary data
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcomment{##Data that is shamelessly taken from the internet }
+data <- \hlfunctioncall{read.csv}(\hlstring{"http://www.ats.ucla.edu/stat/data/binary.csv"})  
+\hlfunctioncall{head}(data)
+\end{alltt}
+\begin{verbatim}
+##   admit gre  gpa rank
+## 1     0 380 3.61    3
+## 2     1 660 3.67    3
+## 3     1 800 4.00    1
+## 4     1 640 3.19    4
+## 5     0 520 2.93    4
+## 6     1 760 3.00    2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Now let's say we want to run a probit on this, both using \texttt{glm} and \texttt{maxLik}, as well as a linear probability model.  Where for some reason we decide to leave a regressor out of the linear model.  First we'll set up our likelihood function and then we'll estimate the three models.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlfunctioncall{library}(maxLik)
+Probit<-\hlfunctioncall{function}(b, X, Y)\{
+     \hlfunctioncall{if}(!\hlfunctioncall{all}(X[,1]==1))\{
+          X<-\hlfunctioncall{cbind}(1, X)
+     \}
+     Xb<-X %*% b
+     ll<-\hlfunctioncall{ifelse}(Y==1,
+                \hlfunctioncall{pnorm}(Xb, log.p=TRUE),
+                \hlfunctioncall{pnorm}(-Xb, log.p=TRUE))
+     \hlfunctioncall{return}(ll)
+\} \hlcomment{##Probit likelihood function}
+
+\hlcomment{####Estimation#####}
+m1<-\hlfunctioncall{lm}(admit~gre, data=data)
+m2<-\hlfunctioncall{glm}(admit~gre+gpa, data=data, family=\hlfunctioncall{binomial}(link=\hlstring{"probit"}))
+
+x.ml<-\hlfunctioncall{with}(data, \hlfunctioncall{cbind}(gre,
+                       gpa))
+y.ml<-data$admit
+b<-\hlfunctioncall{runif}(3)*0.01
+\hlfunctioncall{names}(b)<-\hlfunctioncall{c}(\hlstring{"(Intercept)"}, \hlfunctioncall{colnames}(x.ml))
+m3<-\hlfunctioncall{maxLik}(Probit, start=b, X=x.ml, Y=y.ml, method=\hlstring{"BFGS"})
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+We now have three models, and we can do a couple of things with it.
+
+\subsection{Model Summaries}
+The first step is to generate the model summary.  We do this by using the \verb@mod.sum()@ function.  We have two options.  The first is if we plan on using ``classic'' xtable style and the second is if we want apsrtable style.  For reasons that will be clearer down the road, it is important to make sure that you give all your variables names that match across all the models before running the \verb@mod.sum()@ command.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+info.1<-\hlfunctioncall{mod.sum}(m1)
+\hlfunctioncall{cat}(info.1[[1]]) \hlcomment{##xtable style--Only handles 1 model}
+\end{alltt}
+\begin{verbatim}
+## \hline adj. R$^2$& \multicolumn{4}{c}{0.03159}\\
+## $N$ & \multicolumn{4}{c}{400}\\
+\end{verbatim}
+\begin{alltt}
+
+info.2<-\hlfunctioncall{mod.sum}(m2)
+\hlfunctioncall{cat}(info.2[[1]]) \hlcomment{##xtable style }
+\end{alltt}
+\begin{verbatim}
+## \hline Log $L$ & \multicolumn{4}{c}{-240.1}\\
+## $N$ & \multicolumn{4}{c}{400}\\
+\end{verbatim}
+\begin{alltt}
+
+info.3<-\hlfunctioncall{mod.sum}(m3)
+\hlfunctioncall{cat}(info.3[[1]]) \hlcomment{##xtable style }
+\end{alltt}
+\begin{verbatim}
+## \hline Log $L$ & \multicolumn{4}{c}{-240.1}\\
+## $N$ & \multicolumn{4}{c}{400}\\
+\end{verbatim}
+\begin{alltt}
+
+info.all<-\hlfunctioncall{mod.sum}(m1, m2, m3, apsr=TRUE)
+\hlfunctioncall{cat}(info.all[[1]]) \hlcomment{##Apsrtable style handle n models}
+\end{alltt}
+\begin{verbatim}
+## \hline  Log $L$ &  &  -240.1 &  -240.1\\
+## adj. R$^2$ &  0.03159 &  & \\
+## $N$&  400 &  400 &  400\\
+\end{verbatim}
+\begin{alltt}
+
+info.23<-\hlfunctioncall{mod.sum}(m2, m3, apsr=TRUE)
+\hlfunctioncall{cat}(info.23[[1]]) \hlcomment{##Apsrtable style}
+\end{alltt}
+\begin{verbatim}
+## \hline  Log $L$ &  -240.1 &  -240.1\\
+## $N$ &  400 &  400\\
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+As we can see it picks out the class of the model and reports appropriate information (Log-Likelihood for non-OLS models and adj R$^2$ for OLS).  It also only adds in the R$^2$ row if there is an OLS model in the line-up.  You'll notice that in each case I pulled off the first element of list.  We'll come back to the second part of the list.  We can now put these into a table.
+\subsection{Table 1: Basic xtable+}
+The first table style is the basic \verb@xtable@ plus the model info.  So let's take just \verb@m3@ (the \verb@maxLik@ object).
+\begin{kframe}
+\begin{alltt}
+\hlfunctioncall{xtable.2}(\hlfunctioncall{list}(m3),
+         caption=\hlstring{"xtable Plus"},
+         label=\hlstring{"tab:xtp"},  
+         digits=2,
+         add.to.row=\hlfunctioncall{list}(pos=\hlfunctioncall{list}(info.3[[2]]),
+                         command=info.3[[1]]),
+         include.rownames=FALSE,
+         caption.placement=\hlstring{"top"},
+         table.placement=\hlstring{"H"})
+\end{alltt}
+\end{kframe}
+% latex table generated in R 2.15.2 by xtable 1.7-0 package
+% Thu Nov 29 00:36:25 2012
+\begin{table}[H]
+\begin{center}
+\caption{xtable Plus}
+\label{tab:xtp}
+\begin{tabular}{rrrrr}
+  \hline
+  & Estimate & Std. Error & Z Value & Pr($|$z$|$) \\ 
+  \hline
+(Intercept) & -2.97 & 0.63 & -4.72 & 0.00 \\ 
+  gre & 0.00 & 0.00 & 2.66 & 0.01 \\ 
+  gpa & 0.44 & 0.19 & 2.32 & 0.02 \\ 
+   \hline Log $L$ & \multicolumn{4}{c}{-240.1}\\
+$N$ & \multicolumn{4}{c}{400}\\
+ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+The results of this command are in table \ref{tab:xtp}.  Note that we used the 2nd element of the \verb@mod.sum@ output.  This tells xtable where to put the model info.  It is calculated based on the number of unique variable names.  This is why it is important to make sure you have consistent names prior to running the summary command.  You can name them whatever you want so long as you're consistent across models.
+\subsection{Table 2: APSR Style}
+Let's switch it up and do all three models in one table.
+\begin{kframe}
+\begin{alltt}
+\hlfunctioncall{xtable.2}(\hlfunctioncall{list}(m1, m2, m3),
+         caption=\hlstring{"APSR Style"},
+         label=\hlstring{"tab:apsr"},  
+         digits=2,
+         add.to.row=\hlfunctioncall{list}(pos=\hlfunctioncall{list}(info.all[[2]]), \hlcomment{##Model info placement}
+                         command=info.all[[1]]), \hlcomment{## Model info text}
+         include.rownames=FALSE, \hlcomment{##Needed to exclude row numbers}
+         caption.placement=\hlstring{"top"}, ##Style choice, not necessary
+         table.placement=\hlstring{"H"}, ##Visual choice, not necessary
+         apsr=TRUE, \hlcomment{##apsr style }
+         stars=\hlstring{"default"}, ##default==only at 0.05, use \hlstring{"all"} to get full gammit
+         sanitize.text.function=\hlfunctioncall{function}(x)\{x\} \hlcomment{##needed to stop messy screw-ups}
+)
+\end{alltt}
+
+
+{\ttfamily\noindent\textcolor{warningcolor}{\#\# Warning: invalid factor level, NAs generated}}
+
+{\ttfamily\noindent\textcolor{warningcolor}{\#\# Warning: Nonstandard alignments in align string}}\end{kframe}
+% latex table generated in R 2.15.2 by xtable 1.7-0 package
+% Thu Nov 29 00:36:25 2012
+\begin{table}[H]
+\begin{center}
+\caption{APSR Style}
+\label{tab:apsr}
+\begin{tabular}{lSSS}
+  \hline
+  & \multicolumn{1}{c}{ Model 1 } & \multicolumn{1}{c}{ Model 2 } & \multicolumn{1}{c}{ Model 3 } \\ 
+  \hline
+(Intercept) & -0.12 & -3.00$^*$ & -2.97$^*$ \\ 
+   & (0.12) & (0.63) & (0.63) \\ 
+  gre & 0.00074$^*$ & 0.00164$^*$ & 0.00168$^*$ \\ 
+   & (0.00020) & (0.00063) & (0.00063) \\ 
+  gpa &  & 0.45$^*$ & 0.44$^*$ \\ 
+   &  & (0.19) & (0.19) \\ 
+   \hline  Log $L$ &  &  -240.1 &  -240.1\\
+adj. R$^2$ &  0.03159 &  & \\
+$N$&  400 &  400 &  400\\
+ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+
+To make the change to APSR style make sure you include all the arguements I mark as needed. The warning messages are normal, just ignore them.
+\subsection{Table 3: But wait, there's more...}
+Let's say that you doubt your standard errors and want to change them either with bootstrapping or an analytical correction.  Let's do an example with bootstrapping.  We'll bootstrap \verb@m3@ and have a table with just \verb@m2@ and \verb@m3@
+\begin{kframe}
+\begin{alltt}
+\hlcomment{####bootstrap####}
+Nboots<-50
+boot<-\hlfunctioncall{matrix}(0,
+             nrow=Nboots,
+             ncol=\hlfunctioncall{ncol}(x.ml)+1)
+\hlfunctioncall{for}(i in 1:Nboots)\{
+  rows<-\hlfunctioncall{sample}(\hlfunctioncall{nrow}(data), replace=TRUE)
+  x.sam<-x.ml[rows,]
+  y.sam<-y.ml[rows]
+  boot[i,]<-\hlfunctioncall{maxLik}(Probit, 
+                   start=b, 
+                   X=x.sam, 
+                   Y=y.sam, 
+                   method=\hlstring{"BFGS"})$estimate
+\}
+se.3<-\hlfunctioncall{apply}(boot, 2, sd) \hlcomment{##bootstrapped standard errors}
+se.2<-\hlfunctioncall{sqrt}(\hlfunctioncall{diag}(\hlfunctioncall{vcov}(m2))) \hlcomment{##the standard errors from glm}
+
+\hlcomment{##option 1 use the original coef estimates and new standard errors}
+\hlfunctioncall{xtable.2}(\hlfunctioncall{list}(m2, m3),\hlcomment{##report the coef from the models}
+         se=\hlfunctioncall{list}(se.2, se.3), \hlcomment{##list of se}
+         caption=\hlstring{"APSR Style + bootstrap"},
+         label=\hlstring{"tab:apsr"},  
+         digits=2,
+         add.to.row=\hlfunctioncall{list}(pos=\hlfunctioncall{list}(info.23[[2]]), \hlcomment{##Model info placement}
+                         command=info.23[[1]]), \hlcomment{## Model info text}
+         include.rownames=FALSE, \hlcomment{##Needed to exclude row numbers}
+         caption.placement=\hlstring{"top"}, ##Style choice, not necessary
+         table.placement=\hlstring{"H"}, ##Visual choice, not necessary
+         apsr=TRUE, \hlcomment{##apsr style }
+         stars=\hlstring{"all"}, ##switching to all
+         sanitize.text.function=\hlfunctioncall{function}(x)\{x\} \hlcomment{##needed to stop messy screw-ups}
+)
+\end{alltt}
+
+
+{\ttfamily\noindent\textcolor{warningcolor}{\#\# Warning: invalid factor level, NAs generated}}
+
+{\ttfamily\noindent\textcolor{warningcolor}{\#\# Warning: Nonstandard alignments in align string}}\end{kframe}
+% latex table generated in R 2.15.2 by xtable 1.7-0 package
+% Thu Nov 29 00:36:27 2012
+\begin{table}[H]
+\begin{center}
+\caption{APSR Style + bootstrap}
+\label{tab:apsr}
+\begin{tabular}{lSS}
+  \hline
+  & \multicolumn{1}{c}{ Model 1 } & \multicolumn{1}{c}{ Model 2 } \\ 
+  \hline
+(Intercept) & -3.00$^{***}$ & -2.97$^{***}$ \\ 
+   & (0.63) & (0.64) \\ 
+  gre & 0.00164$^{**}$ & 0.00168$^*$ \\ 
+   & (0.00063) & (0.00071) \\ 
+  gpa & 0.45$^*$ & 0.44$^*$ \\ 
+   & (0.19) & (0.19) \\ 
+   \hline  Log $L$ &  -240.1 &  -240.1\\
+$N$ &  400 &  400\\
+ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{kframe}\begin{alltt}
+
+\hlcomment{##option 2 use just a vector of coefs for m3}
+coef.m3<-\hlfunctioncall{apply}(boot, 2, mean)
+\hlfunctioncall{names}(coef.m3)<-\hlfunctioncall{names}(b) \hlcomment{##Always name things}
+\hlfunctioncall{xtable.2}(\hlfunctioncall{list}(\hlfunctioncall{coef}(m2), coef.m3),\hlcomment{##report the coefs, not models}
+         se=\hlfunctioncall{list}(se.2, se.3), \hlcomment{##list of se}
+         coef=TRUE, \hlcomment{## Note this addition}
+         caption=\hlstring{"APSR Style + bootstrap"},
+         label=\hlstring{"tab:apsr"},  
+         digits=2,
+         model.names<-\hlfunctioncall{c}(\hlstring{"New"}, \hlstring{"Names"}), ##Add a vector of model names if you want
+         add.to.row=\hlfunctioncall{list}(pos=\hlfunctioncall{list}(info.23[[2]]), \hlcomment{##Model info placement}
+                         command=info.23[[1]]), \hlcomment{## Model info text}
+         include.rownames=FALSE, \hlcomment{##Needed to exclude row numbers}
+         caption.placement=\hlstring{"top"}, ##Style choice, not necessary
+         table.placement=\hlstring{"H"}, ##Visual choice, not necessary
+         apsr=TRUE, \hlcomment{##apsr style }
+         stars=\hlstring{"default"}, ##default==only at 0.05, use \hlstring{"all"} to get full gammit
+         sanitize.text.function=\hlfunctioncall{function}(x)\{x\} \hlcomment{##needed to stop messy screw-ups}
+)
+\end{alltt}
+
+
+{\ttfamily\noindent\textcolor{warningcolor}{\#\# Warning: invalid factor level, NAs generated}}
+
+{\ttfamily\noindent\textcolor{warningcolor}{\#\# Warning: Nonstandard alignments in align string}}\end{kframe}
+% latex table generated in R 2.15.2 by xtable 1.7-0 package
+% Thu Nov 29 00:36:27 2012
+\begin{table}[H]
+\begin{center}
+\caption{APSR Style + bootstrap}
+\label{tab:apsr}
+\begin{tabular}{lSS}
+  \hline
+  & \multicolumn{1}{c}{ New } & \multicolumn{1}{c}{ Names } \\ 
+  \hline
+(Intercept) & -3.00$^*$ & -2.89$^*$ \\ 
+   & (0.63) & (0.64) \\ 
+  gre & 0.00164$^*$ & 0.00166$^*$ \\ 
+   & (0.00063) & (0.00071) \\ 
+  gpa & 0.45$^*$ & 0.42$^*$ \\ 
+   & (0.19) & (0.19) \\ 
+   \hline  Log $L$ &  -240.1 &  -240.1\\
+$N$ &  400 &  400\\
+ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{kframe}\begin{alltt}
+
+\end{alltt}
+\end{kframe}
+
+\end{document}
