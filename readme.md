@@ -1,15 +1,15 @@
-% Replication instructions for "Enemies Within" (JCR)
-% Casey Crisman-Cox 
-% 15 May 2018 (Update)
+# Replication instructions for "Enemies Within" (JCR)
+# Casey Crisman-Cox 
+# 15 May 2018 (Update)
 
 
 
-# Replication package contents
+## Replication package contents
 
 This replication package contains the files and code needed to recreate the results from the article "Enemies Within: Interactions Between Terrorists and Democracys" (published in the *Journal of Conflict Resolution*).
 The article can be found [here](http://journals.sagepub.com/doi/abs/10.1177/0022002717698819).
 
-## File structure 
+### File structure 
 
 Main folder 
 
