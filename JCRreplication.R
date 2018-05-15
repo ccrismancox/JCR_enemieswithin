@@ -18,7 +18,7 @@ library(ggplot2)
 library(gridExtra)
 library(lme4)
 library(maxLik)
-library(brms)
+library(brms) 
 library(matrixStats)
 library(stringr)
 
@@ -430,7 +430,7 @@ step1GLMM <- brm(
      +(1|ccode)
      , 
      data=data.full, 
-     cluster=4, iter=4000, seed=12345, #seed doesn't work, results vary, but are close
+     core=4, iter=4000, seed=12345, #seed doesn't work, results vary, but are close
      prior=set_prior("cauchy(0,2.5)", class='b'),
      family=bernoulli)
 
